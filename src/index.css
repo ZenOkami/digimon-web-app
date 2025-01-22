@@ -1,68 +1,84 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background-color: #f0e68c; /* Digimon-themed yellow */
+  color: #2c3e50; /* Dark blue for text */
+  display: flexbox;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Use min-height for flexibility */
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 3rem;
+  text-shadow: 2px 2px #e74c3c; /* Red shadow */
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.explorer {
+  text-align: center;
+  padding: 2rem;
+  overflow-y: auto; 
+  max-width: 90%; /* Limit container width for better responsiveness */
+  margin: 0 auto; 
+  width: 100%;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+h1 {
+  font-size: 3rem;
+  color: #2c3e50; /* Dark blue */
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px #e74c3c; /* Red shadow */
+}
+
+.digimon-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+  gap: 2rem;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) { 
+  .digimon-list {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
   }
-  a:hover {
-    color: #747bff;
+}
+
+@media (min-width: 1024px) { 
+  .digimon-list {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
   }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+.digimon-card {
+  background-color: #fff;
+  border: 2px solid #2c3e50; /* Dark blue border */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.digimon-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.digimon-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.digimon-card h2 {
+  font-size: 1.5rem;
+  color: #e74c3c; /* Red text */
+  margin: 0.5rem 0;
+}
+
+.digimon-card p {
+  font-size: 1rem;
+  color: #2c3e50;
 }
