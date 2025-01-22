@@ -82,3 +82,19 @@ h1 {
   font-size: 1rem;
   color: #2c3e50;
 }
+
+.search-bar {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  margin: 1rem auto;
+  border: 2px solid #2c3e50; /* Dark blue border */
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #e74c3c; /* Red border on focus */
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); /* Subtle red glow */
+}
