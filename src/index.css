@@ -1,58 +1,78 @@
+/* Body */
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #f0e68c; /* Digimon-themed yellow */
-  color: #2c3e50; /* Dark blue for text */
-  display: flexbox;
+  background: linear-gradient(to bottom, #f0e68c, #ffcc00); /* Gradient for depth */
+  color: #2c3e50;
   justify-content: center;
+  display: flexbox;
   align-items: center;
-  min-height: 100vh; /* Use min-height for flexibility */
+  min-height: 100vh;
 }
 
-h1 {
-  font-size: 3rem;
-  text-shadow: 2px 2px #e74c3c; /* Red shadow */
-}
-
+/* Hero Section */
 .explorer {
   text-align: center;
   padding: 2rem;
-  overflow-y: auto; 
-  max-width: 90%; /* Limit container width for better responsiveness */
-  margin: 0 auto; 
+  overflow-y: auto;
+  max-width: 90%;
+  margin: 0 auto;
   width: 100%;
+  background: url('https://via.placeholder.com/1200x400') center/cover no-repeat;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
   font-size: 3rem;
-  color: #2c3e50; /* Dark blue */
+  color: #2c3e50;
   margin-bottom: 1rem;
-  text-shadow: 2px 2px #e74c3c; /* Red shadow */
+  text-shadow: 3px 3px #e74c3c;
 }
 
+/* Search Bar */
+.search-bar {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  margin: 1rem auto;
+  border: 2px solid #2c3e50;
+  border-radius: 20px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #e74c3c;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+}
+
+/* Digimon List */
 .digimon-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 2rem;
   padding: 2rem;
   margin: 0 auto;
 }
 
-@media (min-width: 768px) { 
+@media (min-width: 768px) {
   .digimon-list {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 }
 
-@media (min-width: 1024px) { 
+@media (min-width: 1024px) {
   .digimon-list {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
 
+/* Digimon Card */
 .digimon-card {
   background-color: #fff;
-  border: 2px solid #2c3e50; /* Dark blue border */
+  border: 2px solid #2c3e50;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1rem;
@@ -74,7 +94,7 @@ h1 {
 
 .digimon-card h2 {
   font-size: 1.5rem;
-  color: #e74c3c; /* Red text */
+  color: #e74c3c;
   margin: 0.5rem 0;
 }
 
@@ -83,18 +103,34 @@ h1 {
   color: #2c3e50;
 }
 
-.search-bar {
-  width: 100%;
-  max-width: 400px;
-  padding: 0.5rem;
-  margin: 1rem auto;
-  border: 2px solid #2c3e50; /* Dark blue border */
-  border-radius: 8px;
-  font-size: 1rem;
+/* Loading & No Results */
+.loading-message, .no-results-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+  margin: 1rem 0;
+  animation: pulse 1.5s infinite;
 }
 
-.search-bar:focus {
-  outline: none;
-  border-color: #e74c3c; /* Red border on focus */
-  box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); /* Subtle red glow */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .search-bar {
+    width: 90%;
+  }
 }

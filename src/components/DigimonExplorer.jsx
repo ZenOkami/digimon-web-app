@@ -4,6 +4,7 @@ export const DigimonExplorer = () => {
     const [digimonList, setDigimonList] = useState([]);
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDigimon = async () => {
@@ -15,8 +16,10 @@ export const DigimonExplorer = () => {
 
                 const data = await response.json();
                 setDigimonList(data);
+                setLoading(false);
             } catch (err) {
                 setError(err.message);
+                setLoading(false);
                 console.error('No Digimon found:', err);
             }
         };
@@ -33,6 +36,7 @@ export const DigimonExplorer = () => {
     return (
         <div className="explorer">
             <h1>Digimon Explorer</h1>
+            <label htmlFor="search-bar" style={{ display: 'none' }}>Search Digimon</label>
             <input 
                 type='text'
                 placeholder='Search Digimon...'
@@ -40,8 +44,10 @@ export const DigimonExplorer = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className='search-bar'
             />
+            {loading && <h1>Loading Digimon...</h1>}
+            {!loading && (
             <div className="digimon-list">
-                {filteredDigimon.map((digimon) => (
+                {filteredDigimon.length === 0 ? <p className='no-results-message'>No Digimon found</p> : ( filteredDigimon.map((digimon) => (
                     <div key={digimon.name} className="digimon-card">
                         <img 
                             src={digimon.img}
@@ -50,8 +56,10 @@ export const DigimonExplorer = () => {
                         <h2>{digimon.name}</h2>
                         <p>Level: {digimon.level}</p>
                     </div>
-                ))}
+                ))
+            )}
             </div>
+            )};
         </div>
     );
 };
