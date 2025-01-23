@@ -11,7 +11,7 @@ const DigimonExplorer = () => {
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    useEffect(() => {
+    const fetchDigimon = useEffect(() => {
         const fetchDigimon = async () => {
             try {
                 const response = await fetch("https://digimon-api.vercel.app/api/digimon");
@@ -56,6 +56,8 @@ const DigimonExplorer = () => {
             if (uniqueDigimon.length < 10) {
                 setHasMore(false);
             }
+
+            fetchMoreData();
         } catch (err) {
             setError(err.message);
             setHasMore(false);
@@ -63,7 +65,7 @@ const DigimonExplorer = () => {
         } finally {
             setLoadingMore(false); // Stop loading
             setPage((prevPage) => prevPage + 1);
-        }
+        };
     };      
     
 
@@ -90,28 +92,28 @@ const DigimonExplorer = () => {
 
     return (
         <div className="explorer">
-        <h1>Digimon Explorer</h1>
-        <label htmlFor="search-bar" style={{ display: 'none' }}>Search Digimon</label>
-        <div className='controls'>
-        <input 
-        type='text'
-        placeholder='Search Digimon...'
-        aria-label="Search Digimon"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className='search-bar'
-        />
-        <select 
-        value={sortCriteria}
-        onChange={(e) => setSortCriteria(e.target.value)}
-        className='sort-dropdown'
-        aria-label="Search Digimon"
-        >
-        <option value="">Sort By</option>
-        <option value="name" selected>Name</option>
-        <option value="level">Level</option>
-        </select>
-        </div>
+            <h1>Digimon Explorer</h1>
+            <label htmlFor="search-bar" style={{ display: 'none' }}>Search Digimon</label>
+            <div className='controls'>
+                <input 
+                    type='text'
+                    placeholder='Search Digimon...'
+                    aria-label="Search Digimon"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className='search-bar'
+                />
+                <select 
+                    value={sortCriteria}
+                    onChange={(e) => setSortCriteria(e.target.value)}
+                    className='sort-dropdown'
+                    aria-label="Search Digimon"
+                >
+                    <option value="">Sort By</option>
+                    <option value="name" defaultValue={true}>Name</option>
+                    <option value="level">Level</option>
+                </select>
+            </div>
         
             <InfiniteScroll
                 dataLength={sortedDigimon.length}
@@ -137,18 +139,18 @@ const DigimonExplorer = () => {
             {loading && <h1>Loading Digimon...</h1>}
             {!loading && (
                 <div className="digimon-list">
-                {sortedDigimon.length === 0 ? <p className='no-results-message'>No Digimon found</p> : ( sortedDigimon.map((digimon) => (
-                    <div key={digimon.name} className="digimon-card">
-                    <img 
-                    src={digimon.img}
-                    alt={digimon.name}
-                    />
-                    <h2>{digimon.name}</h2>
-                    <p>Level: {digimon.level}</p>
-                    </div>
-                    ))
-                    )}
-                    </div>
+                        {sortedDigimon.length === 0 ? <h4 className='no-results-message'>No Digimon found</h4> : ( sortedDigimon.map((digimon) => (
+                            <div key={digimon.name} className="digimon-card">
+                                <img 
+                                src={digimon.img}
+                                alt={digimon.name}
+                                />
+                                <h2>{digimon.name}</h2>
+                                <p>Level: {digimon.level}</p>
+                            </div>
+                            ))
+                        )}
+                        </div>
                     )};
                 </InfiniteScroll>
                 </div>
