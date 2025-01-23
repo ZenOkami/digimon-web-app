@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { DigimonExplorer } from './components/DigimonExplorer';
+import DigimonExplorer from './components/DigimonExplorer';
 
 const App = () => {
   return (
