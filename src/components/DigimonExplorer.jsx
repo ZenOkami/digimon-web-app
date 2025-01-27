@@ -7,79 +7,43 @@ const DigimonExplorer = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [sortCriteria, setSortCriteria] = useState('');
-    const [page, setPage] = useState(1);
+    const [currentId, setCurrentId] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
 
-    const fetchDigimon = useEffect(() => {
+    useEffect(() => {
         const fetchDigimon = async () => {
             try {
-                const response = await fetch("https://digimon-api.vercel.app/api/digimon");
-                if (!response.ok) {
-                    throw new Error('Error fetching Digimon API response');
+                const fetchedDigimon = [];
+                for (let id = 1; id <= 1460; id++) {
+                    const response = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+                    if (!response.ok) {
+                        console.error(`Failed to fetch Digimon with ID: ${id}`);
+                        continue;
+                    }
+                    const data = await response.json();
+                    fetchedDigimon.push(data);
                 }
-
-                const data = await response.json();
-                setDigimonList(data);
-                setLoading(false);
+                setDigimonList(fetchedDigimon);
             } catch (err) {
-                setError(err.message);
+                setError('Failed to fetch Digimon data');
+                console.error(err);
+            } finally {
                 setLoading(false);
-                console.error('No Digimon found:', err);
             }
         };
 
         fetchDigimon();
     }, []);
 
-    const fetchMoreData = async () => {
-        setLoadingMore(true); // Start loading
-        try {
-            const response = await fetch(`https://digimon-api.vercel.app/api/digimon?page=${page}`);
-            if (!response.ok) {
-                throw new Error("Error fetching Digimon data");
-            }
-    
-            const newData = await response.json();
-    
-            if (newData.length === 0) {
-                setHasMore(false); // No more data to load
-                return;
-            }
-    
-            const uniqueDigimon = newData.filter(
-                (newDigimon) => !digimonList.some((existingDigimon) => existingDigimon.name === newDigimon.name)
-            );
-    
-            setDigimonList((prevList) => [...prevList, ...uniqueDigimon]);
-    
-            if (uniqueDigimon.length < 10) {
-                setHasMore(false);
-            }
-
-            fetchMoreData();
-        } catch (err) {
-            setError(err.message);
-            setHasMore(false);
-            console.error(err);
-        } finally {
-            setLoadingMore(false); // Stop loading
-            setPage((prevPage) => prevPage + 1);
-        };
-    };      
-    
-
     const sortedDigimon = useMemo(() => {
         return digimonList
             .filter((digimon) => digimon.name.toLowerCase().includes(searchQuery.toLowerCase()))
             .sort((a, b) => {
                 if (sortCriteria === 'name') return a.name.localeCompare(b.name);
-                if (sortCriteria === 'level') return a.level.localeCompare(b.level);
+                if (sortCriteria === 'level') return a.levels[0]?.level.localeCompare(b.levels[0]?.level);
                 return 0;
-            })
-            .slice(0, page * 10); // Show 10 Digimon per page
-    }, [digimonList, searchQuery, sortCriteria, page]);
-    
+            });
+    }, [digimonList, searchQuery, sortCriteria]);
 
     if (error) {
         return (
@@ -107,20 +71,20 @@ const DigimonExplorer = () => {
                     value={sortCriteria}
                     onChange={(e) => setSortCriteria(e.target.value)}
                     className='sort-dropdown'
-                    aria-label="Search Digimon"
+                    aria-label="Sort Digimon"
                 >
                     <option value="">Sort By</option>
-                    <option value="name" defaultValue={true}>Name</option>
+                    <option value="name">Name</option>
                     <option value="level">Level</option>
                 </select>
             </div>
         
             <InfiniteScroll
                 dataLength={sortedDigimon.length}
-                next={fetchMoreData}
-                hasMore={hasMore}
+                next={() => {}} // No more infinite scrolling as we fetch all data upfront
+                hasMore={false}
                 loader={
-                    loadingMore ? (
+                    loading ? (
                         <div style={{ textAlign: 'center', margin: '20px 0' }}>
                             <img 
                                 src="https://i.gifer.com/ZZ5H.gif" 
@@ -130,11 +94,11 @@ const DigimonExplorer = () => {
                         </div>
                     ) : null
                 }
-                endMessage={
-                    <h4 style={{ textAlign: 'center', margin: '20px 0' }}>
-                        No more Digimon to load!
-                    </h4>
-                }
+                // endMessage={
+                //     <h4 style={{ textAlign: 'center', margin: '20px 0' }}>
+                //         All Digimon have been loaded!
+                //     </h4>
+                // }
             >    
             {loading && <h1>Loading Digimon...</h1>}
             {!loading && (
@@ -142,20 +106,21 @@ const DigimonExplorer = () => {
                         {sortedDigimon.length === 0 ? <h4 className='no-results-message'>No Digimon found</h4> : ( sortedDigimon.map((digimon) => (
                             <div key={digimon.name} className="digimon-card">
                                 <img 
-                                src={digimon.img}
-                                alt={digimon.name}
+                                    src={digimon.images[0]?.href || ''} 
+                                    alt={digimon.name} 
                                 />
+
                                 <h2>{digimon.name}</h2>
-                                <p>Level: {digimon.level}</p>
+                                <p>Level: {digimon.levels[0]?.level}</p>
                             </div>
                             ))
                         )}
                         </div>
-                    )};
+                    )}
                 </InfiniteScroll>
                 </div>
         
-    );
-};
+        )
+    }
 
-export default DigimonExplorer
+export default DigimonExplorer;
