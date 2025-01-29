@@ -56,7 +56,10 @@ const DigimonExplorer = () => {
 
     return (
         <div className="explorer">
-            <h1>Digimon Explorer</h1>
+            <h1 
+                style={{cursor: 'pointer'}} 
+                onClick={() => window.location.reload()}
+            > Digimon Explorer</h1>
             <label htmlFor="search-bar" style={{ display: 'none' }}>Search Digimon</label>
             <div className='controls'>
                 <input 
