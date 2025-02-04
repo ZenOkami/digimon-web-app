@@ -50,14 +50,17 @@ const DigimonExplorer = () => {
     }
 
     const loadMoreDigimon = async () => {
+        setLoading(true); // Show loader
         const newBatch = await fetchDigimonBatch(currentId, limit);
+    
         if (newBatch.length === 0) {
-            setHasMore(false);
-            return;
+            setHasMore(false); // Stop infinite scroll when no more data
+        } else {
+            setDigimonList((prevList) => [...prevList, ...newBatch]); // Append new data
+            setCurrentId(currentId + limit); // Increment ID range
         }
-        setDigimonList((prevList) => [...prevList, ...newBatch] );
-        setCurrentId(currentId + limit);
-    };
+        setLoading(false); // Hide loader
+    };    
 
     return (
         <div className="explorer">
@@ -88,44 +91,31 @@ const DigimonExplorer = () => {
             </div>
         
             <InfiniteScroll
-                dataLength={sortedDigimon.length}
-                next={loadMoreDigimon} // No more infinite scrolling as we fetch all data upfront
-                hasMore={hasMore}
-                loader={
-                    loading ? (
-                        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-                            <img 
-                                src="https://i.gifer.com/ZZ5H.gif" 
-                                alt="Loading..." 
-                                style={{ width: '50px', height: '50px' }}
-                            />
-                        </div>
-                    ) : null
-                }
-                // endMessage={
-                //     <h4 style={{ textAlign: 'center', margin: '20px 0' }}>
-                //         All Digimon have been loaded!
-                //     </h4>
-                // }
-            >    
-            {loading && <h1>Loading Digimon...</h1>}
-            {!loading && (
-                <div className="digimon-list">
-                        {sortedDigimon.length === 0 ? <h4 className='no-results-message'>No Digimon found</h4> : ( sortedDigimon.map((digimon) => (
-                            <div key={digimon.name} className="digimon-card">
-                                <img 
-                                    src={digimon.images[0]?.href || ''} 
-                                    alt={digimon.name} 
-                                />
-
-                                <h2>{digimon.name}</h2>
-                                <p>Level: {digimon.levels[0]?.level}</p>
-                            </div>
-                            ))
-                        )}
-                        </div>
-                    )}
-                </InfiniteScroll>
+            dataLength={digimonList.length}
+            next={loadMoreDigimon}
+            hasMore={hasMore}
+            loader={
+                loading && (
+                    <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                        <img
+                            src="https://i.gifer.com/ZZ5H.gif"
+                            alt="Loading..."
+                            style={{ width: '50px', height: '50px' }}
+                        />
+                    </div>
+                )
+            }
+        >
+            <div className="digimon-list">
+                {sortedDigimon.map((digimon) => (
+                    <div key={digimon.name} className="digimon-card">
+                        <img src={digimon.images[0]?.href || ''} alt={digimon.name} />
+                        <h2>{digimon.name}</h2>
+                        <p>Level: {digimon.levels[0]?.level}</p>
+                    </div>
+                ))}
+            </div>
+        </InfiniteScroll>        
                 </div>
         
         )
