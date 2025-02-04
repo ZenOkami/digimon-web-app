@@ -9,31 +9,26 @@ const DigimonExplorer = () => {
     const [sortCriteria, setSortCriteria] = useState('');
     const [currentId, setCurrentId] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [limit, setLimit] = useState(20);
 
-    useEffect(() => {
-        const fetchDigimon = async () => {
+    const fetchDigimonBatch = async (startId, limit) => {
+        const fetchedDigimon = [];
+        for (let id = startId; id <= startId + limit; id++) {
             try {
-                const fetchedDigimon = [];
-                for (let id = 1; id <= 1460; id++) {
-                    const response = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
-                    if (!response.ok) {
-                        console.error(`Failed to fetch Digimon with ID: ${id}`);
-                        continue;
-                    }
-                    const data = await response.json();
-                    fetchedDigimon.push(data);
+                const response = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+                if (!response.ok) {
+                    console.error(`Failed to fetch Digimon with ID: ${id}`);
+                    continue;
                 }
-                setDigimonList(fetchedDigimon);
+                const data = await response.json();
+                fetchedDigimon.push(data);        
+                
             } catch (err) {
-                setError('Failed to fetch Digimon data');
-                console.error(err);
-            } finally {
-                setLoading(false);
+                console.error('Error fetching Digimon:', err);
             }
-        };
-
-        fetchDigimon();
-    }, []);
+        }
+        return fetchedDigimon;
+};
 
     const sortedDigimon = useMemo(() => {
         return digimonList
@@ -53,6 +48,16 @@ const DigimonExplorer = () => {
             </div>
         );
     }
+
+    const loadMoreDigimon = async () => {
+        const newBatch = await fetchDigimonBatch(currentId, limit);
+        if (newBatch.length === 0) {
+            setHasMore(false);
+            return;
+        }
+        setDigimonList((prevList) => [...prevList, ...newBatch] );
+        setCurrentId(currentId + limit);
+    };
 
     return (
         <div className="explorer">
@@ -84,8 +89,8 @@ const DigimonExplorer = () => {
         
             <InfiniteScroll
                 dataLength={sortedDigimon.length}
-                next={() => {}} // No more infinite scrolling as we fetch all data upfront
-                hasMore={false}
+                next={loadMoreDigimon} // No more infinite scrolling as we fetch all data upfront
+                hasMore={hasMore}
                 loader={
                     loading ? (
                         <div style={{ textAlign: 'center', margin: '20px 0' }}>
