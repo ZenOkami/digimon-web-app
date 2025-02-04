@@ -21,7 +21,8 @@ const DigimonExplorer = () => {
                     continue;
                 }
                 const data = await response.json();
-                fetchedDigimon.push(data);        
+                fetchedDigimon.push(data);
+                setDigimonList(fetchedDigimon);        
                 
             } catch (err) {
                 console.error('Error fetching Digimon:', err);
@@ -61,6 +62,23 @@ const DigimonExplorer = () => {
         }
         setLoading(false); // Hide loader
     };    
+
+    useEffect(() => {
+        loadMoreDigimon();
+    }, []);
+
+    if (error) {
+        return (
+            <div className="error-container">
+                <h1>Error: {error}</h1>
+                <button onClick={() => window.location.reload()}>Reload</button>
+            </div>
+        );
+    }
+    
+    if (sortedDigimon.length === 0 && !loading) {
+        return <h4 className="no-results-message">No Digimon found</h4>;
+    }
 
     return (
         <div className="explorer">
