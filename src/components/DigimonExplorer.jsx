@@ -75,10 +75,6 @@ const DigimonExplorer = () => {
         );
     }
 
-    if (sortedDigimon.length === 0 && !loading) {
-        return <h4 className="no-results-message">No Digimon found</h4>;
-    }
-
     return (
         <div className="explorer">
             <h1 style={{ cursor: 'pointer' }} onClick={() => window.location.reload()}>
@@ -122,7 +118,7 @@ const DigimonExplorer = () => {
                     )
                 }
             >
-                <div className="digimon-list">
+                {(sortedDigimon.length === 0 && !loading) ? <h4 className="no-results-message">No Digimon found</h4> : (<div className="digimon-list">
                     {sortedDigimon.map((digimon, index) => (
                         <div key={`${digimon.name}-${index}`} className="digimon-card">
                             <img src={digimon.images[0]?.href || ''} alt={digimon.name} />
@@ -130,7 +126,7 @@ const DigimonExplorer = () => {
                             <p>Level: {digimon.levels[0]?.level}</p>
                         </div>
                     ))}
-                </div>
+                </div>)}
             </InfiniteScroll>
         </div>
     );
