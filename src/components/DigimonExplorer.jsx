@@ -3,68 +3,87 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 const DigimonExplorer = () => {
     const [digimonList, setDigimonList] = useState([]);
+    const [allDigimon, setAllDigimon] = useState([]); // Store all Digimon names and IDs
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [sortCriteria, setSortCriteria] = useState('');
     const [hasMore, setHasMore] = useState(true);
     const limit = 20;
-    const currentIdRef = useRef(1); // Use ref to track the current starting ID
-    const fetchedIds = useRef(new Set()); // Use ref to track fetched IDs
+    const currentIdRef = useRef(1);
+    const fetchedIds = useRef(new Set());
+
+    // Fetch all Digimon names and IDs for global search
+    useEffect(() => {
+        const fetchAllDigimon = async () => {
+            try {
+                const response = await fetch('https://digi-api.com/api/v1/digimon');
+                if (!response.ok) throw new Error('Failed to fetch all Digimon');
+                const data = await response.json();
+                setAllDigimon(data.content);
+            } catch (err) {
+                console.error('Error fetching all Digimon:', err);
+                setError('Error fetching Digimon data. Please try again later.');
+            }
+        };
+        fetchAllDigimon();
+    }, []);
 
     const fetchDigimonBatch = async (startId, limit) => {
         const fetchedDigimon = [];
         for (let id = startId; id < startId + limit; id++) {
             try {
-                if (fetchedIds.current.has(id)) continue; // Skip if already fetched
+                if (fetchedIds.current.has(id)) continue;
 
                 const response = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
-                if (!response.ok) {
-                    console.error(`Failed to fetch Digimon with ID: ${id}`);
-                    continue;
-                }
+                if (!response.ok) continue;
 
                 const data = await response.json();
-                fetchedIds.current.add(id); // Mark this ID as fetched
+                fetchedIds.current.add(id);
                 fetchedDigimon.push(data);
             } catch (err) {
-                console.error('Error fetching Digimon:', err);
+                console.error(`Error fetching Digimon ID ${id}:`, err);
             }
         }
         return fetchedDigimon;
     };
 
     const loadMoreDigimon = useCallback(async () => {
-        if (loading) return; // Prevent overlapping calls
+        if (loading) return;
 
         setLoading(true);
-
         const startId = currentIdRef.current;
         const newBatch = await fetchDigimonBatch(startId, limit);
 
         if (newBatch.length === 0) {
-            setHasMore(false); // Stop infinite scroll when no more data
+            setHasMore(false);
         } else {
-            setDigimonList((prevList) => [...prevList, ...newBatch]); // Append new data
-            currentIdRef.current += limit; // Increment ID range
+            setDigimonList((prevList) => {
+                const combinedList = [...prevList, ...newBatch];
+                const uniqueList = Array.from(new Map(combinedList.map((item) => [item.id, item])).values());
+                return uniqueList;
+            });
+            currentIdRef.current += limit;
         }
 
         setLoading(false);
-    }, [limit]);
+    }, [loading, limit]);
 
     useEffect(() => {
-        loadMoreDigimon(); // Fetch the initial batch on mount
+        loadMoreDigimon();
     }, [loadMoreDigimon]);
 
-    const sortedDigimon = useMemo(() => {
-        return digimonList
-            .filter((digimon) => digimon.name.toLowerCase().includes(searchQuery.toLowerCase()))
-            .sort((a, b) => {
-                if (sortCriteria === 'name') return a.name.localeCompare(b.name);
-                if (sortCriteria === 'level') return (a.levels[0]?.level || '').localeCompare(b.levels[0]?.level || '');
-                return 0;
-            });
-    }, [digimonList, searchQuery, sortCriteria]);
+    const filteredDigimon = useMemo(() => {
+        const searchLower = searchQuery.toLowerCase();
+        return (searchQuery
+            ? allDigimon.filter((digimon) => digimon.name.toLowerCase().includes(searchLower))
+            : digimonList
+        ).sort((a, b) => {
+            if (sortCriteria === 'name') return a.name.localeCompare(b.name);
+            if (sortCriteria === 'level') return (a.levels[0]?.level || '').localeCompare(b.levels[0]?.level || '');
+            return 0;
+        });
+    }, [allDigimon, digimonList, searchQuery, sortCriteria]);
 
     if (error) {
         return (
@@ -118,15 +137,15 @@ const DigimonExplorer = () => {
                     )
                 }
             >
-                {(sortedDigimon.length === 0 && !loading) ? <h4 className="no-results-message">No Digimon found</h4> : (<div className="digimon-list">
-                    {sortedDigimon.map((digimon, index) => (
-                        <div key={`${digimon.name}-${index}`} className="digimon-card">
-                            <img src={digimon.images[0]?.href || ''} alt={digimon.name} />
-                            <h2>{digimon.name}</h2>
-                            <p>Level: {digimon.levels[0]?.level}</p>
-                        </div>
-                    ))}
-                </div>)}
+            {filteredDigimon?.map((digimon, index) => (
+                digimon && (
+                    <div key={`${digimon.name}-${index}`} className="digimon-card">
+                        <img src={Array.isArray(digimon?.images) && digimon?.images[0]?.href ? digimon.images[0].href : ''} alt={digimon?.name || 'Unknown Digimon'} />
+                        <h2>{digimon?.name || 'Unknown Name'}</h2>
+                        <p>Level: {Array.isArray(digimon?.levels) && digimon?.levels[0]?.level ? digimon.levels[0].level : 'Unknown Level'}</p>
+                    </div>
+                )
+            ))}                      
             </InfiniteScroll>
         </div>
     );
