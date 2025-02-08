@@ -31,13 +31,13 @@ const DigimonExplorer = () => {
 
     const fetchDigimonBatch = async (startId, limit) => {
         const fetchedDigimon = [];
-        for (let id = startId; id < startId + limit; id++) {
+        // Calculate ending ID, ensuring it does not exceed 1460
+        const endId = Math.min(startId + limit - 1, 1460);
+        for (let id = startId; id <= endId; id++) {
             try {
                 if (fetchedIds.current.has(id)) continue;
-
                 const response = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
                 if (!response.ok) continue;
-
                 const data = await response.json();
                 fetchedIds.current.add(id);
                 fetchedDigimon.push(data);
@@ -50,6 +50,12 @@ const DigimonExplorer = () => {
 
     const loadMoreDigimon = useCallback(async () => {
         if (loading) return;
+
+        // Stop fetching if current ID exceeds 1460
+        if (currentIdRef.current > 1460) {
+            setHasMore(false);
+            return;
+        }
 
         setLoading(true);
         const startId = currentIdRef.current;
@@ -65,7 +71,6 @@ const DigimonExplorer = () => {
             });
             currentIdRef.current += limit;
         }
-
         setLoading(false);
     }, [loading, limit]);
 
@@ -137,15 +142,15 @@ const DigimonExplorer = () => {
                     )
                 }
             >
-            {filteredDigimon?.map((digimon, index) => (
-                digimon && (
-                    <div key={`${digimon.name}-${index}`} className="digimon-card">
-                        <img src={Array.isArray(digimon?.images) && digimon?.images[0]?.href ? digimon.images[0].href : ''} alt={digimon?.name || 'Unknown Digimon'} />
-                        <h2>{digimon?.name || 'Unknown Name'}</h2>
-                        <p>Level: {Array.isArray(digimon?.levels) && digimon?.levels[0]?.level ? digimon.levels[0].level : 'Unknown Level'}</p>
-                    </div>
-                )
-            ))}                      
+                {filteredDigimon?.map((digimon, index) => (
+                    digimon && (
+                        <div key={`${digimon.name}-${index}`} className="digimon-card">
+                            <img src={Array.isArray(digimon?.images) && digimon?.images[0]?.href ? digimon.images[0].href : ''} alt={digimon?.name || 'Unknown Digimon'} />
+                            <h2>{digimon?.name || 'Unknown Name'}</h2>
+                            <p>Level: {Array.isArray(digimon?.levels) && digimon?.levels[0]?.level ? digimon.levels[0].level : 'Unknown Level'}</p>
+                        </div>
+                    )
+                ))}
             </InfiniteScroll>
         </div>
     );
